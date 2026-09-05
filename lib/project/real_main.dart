@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       return ScreenUtilInit(
         designSize: Size(428.0, 926.0),
         builder: (_, child) => MaterialApp(
-          title: 'MMAS',
+          title: 'Spendrym',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             textTheme: TextTheme(

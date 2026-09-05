@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mmas.money_assistant_2608">
    <application
-        android:label="MMAS"
+        android:label="Spendrym"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

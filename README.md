@@ -1,4 +1,4 @@
-# MMAS: Money Tracker
+# Spendrym: Money Tracker
 
 > An optimized application for daily expense tracking and finance management. <br />
 

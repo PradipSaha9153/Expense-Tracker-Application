@@ -26,7 +26,7 @@ class SignIn extends StatelessWidget {
       top: Radius.circular(20.0),
     );
     return FlutterLogin(
-      title: 'MMAS',
+      title: 'Spendrym',
       logo: 'Hi!',
       onSignup: _authenticateSignUp,
       onLogin: _authenticateUsers,
