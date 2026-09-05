@@ -432,8 +432,6 @@ class _ReportBodyState extends State<ReportBody> {
                                                   key: ObjectKey(
                                                       selectedTransactions[
                                                           int]),
-                                                  performsFirstActionWithFullSwipe:
-                                                      true,
                                                   trailingActions: <
                                                       SwipeAction>[
                                                     SwipeAction(
@@ -558,7 +556,7 @@ class _ReportBodyState extends State<ReportBody> {
 }
 
 /// Returns the list of spline area series with horizontal gradient.
-List<ChartSeries<MonthAmount, String>> _getGradientAreaSeries(
+List<CartesianSeries<MonthAmount, String>> _getGradientAreaSeries(
     String type, List<MonthAmount> monthAmountList) {
   // final List<Color> color = <Color>[];
   // color.add(Colors.blue[200]!);
@@ -568,7 +566,7 @@ List<ChartSeries<MonthAmount, String>> _getGradientAreaSeries(
   // stops.add(0.2);
   // stops.add(0.7);
 
-  return <ChartSeries<MonthAmount, String>>[
+  return <CartesianSeries<MonthAmount, String>>[
     SplineAreaSeries<MonthAmount, String>(
       /// To set the gradient colors for border here.
       borderGradient: type == 'Income'

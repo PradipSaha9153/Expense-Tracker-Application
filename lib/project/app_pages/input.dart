@@ -4,7 +4,6 @@ import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_material_pickers/flutter_material_pickers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -615,25 +614,39 @@ class _DateCardState extends State<DateCard> {
               if (_pc.isPanelOpen) {
                 _pc.close();
               }
-              showMaterialDatePicker(
-                headerColor: blue3,
-                headerTextColor: Colors.black,
-                backgroundColor: white,
-                buttonTextColor: Color.fromRGBO(80, 157, 253, 1),
-                cancelText: getTranslated(context, 'CANCEL'),
-                confirmText: getTranslated(context, 'OK') ?? 'OK',
-                maxLongSide: 450.w,
-                maxShortSide: 300.w,
-                title: getTranslated(context, 'Select a date'),
+              showDatePicker(
                 context: context,
+                initialDate: DateFormat('dd/MM/yyyy').parse(model.date!),
                 firstDate: DateTime(1990, 1, 1),
                 lastDate: DateTime(2050, 12, 31),
-                selectedDate: DateFormat('dd/MM/yyyy').parse(model.date!),
-                onChanged: (value) => setState(() {
-                  selectedDate = value;
-                  model.date = DateFormat('dd/MM/yyyy').format(value);
-                }),
-              );
+                confirmText: getTranslated(context, 'OK') ?? 'OK',
+                cancelText: getTranslated(context, 'CANCEL'),
+                helpText: getTranslated(context, 'Select a date'),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: blue3,
+                        onPrimary: Colors.black,
+                        onSurface: Colors.black,
+                      ),
+                      textButtonTheme: TextButtonThemeData(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Color.fromRGBO(80, 157, 253, 1),
+                        ),
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
+              ).then((value) {
+                if (value != null) {
+                  setState(() {
+                    selectedDate = value;
+                    model.date = DateFormat('dd/MM/yyyy').format(value);
+                  });
+                }
+              });
             },
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -673,11 +686,11 @@ class _DateCardState extends State<DateCard> {
                         horizontal: 50.w, vertical: 30.0.h),
                     elevation: 12,
                     context: context,
-                    value: selectedTime,
+                    value: Time(hour: selectedTime.hour, minute: selectedTime.minute),
                     is24HrFormat: true,
                     onChange: (value) => setState(() {
-                          selectedTime = value;
-                          model.time = value.format(context);
+                          selectedTime = TimeOfDay(hour: value.hour, minute: value.minute);
+                          model.time = selectedTime.format(context);
                         })),
               );
             },

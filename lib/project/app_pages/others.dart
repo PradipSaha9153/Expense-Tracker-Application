@@ -1,9 +1,5 @@
-import 'dart:core';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
 import 'package:money_assistant_2608/project/app_pages/select_date_format.dart';
@@ -41,7 +37,7 @@ class Other extends StatelessWidget {
                   CircleAvatar(
                     child: CircleAvatar(
                         child: Icon(
-                          FontAwesomeIcons.smileBeam,
+                          Icons.sentiment_very_satisfied,
                           color: Colors.black,
                           size: 71.sp,
                         ),

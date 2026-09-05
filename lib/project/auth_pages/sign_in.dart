@@ -1,13 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../home.dart';
 
 class SignIn extends StatelessWidget {
   Future<String?>? _authenticateUsers(LoginData data) {
     print('authenticate users');
+    return Future.delayed(Duration(seconds: 1)).then((_) => null);
+  }
+
+  Future<String?>? _authenticateSignUp(SignupData data) {
+    print('authenticate signUp');
     return Future.delayed(Duration(seconds: 1)).then((_) => null);
   }
 
@@ -25,7 +28,7 @@ class SignIn extends StatelessWidget {
     return FlutterLogin(
       title: 'MMAS',
       logo: 'Hi!',
-      onSignup: _authenticateUsers,
+      onSignup: _authenticateSignUp,
       onLogin: _authenticateUsers,
       onRecoverPassword: _onRecoverPassword,
       onSubmitAnimationCompleted: () {
@@ -47,7 +50,7 @@ class SignIn extends StatelessWidget {
       ),
       loginProviders: <LoginProvider>[
         LoginProvider(
-          icon: FontAwesomeIcons.google,
+          icon: Icons.g_mobiledata,
           label: 'Google',
           callback: () async {
             print('start google sign in');
@@ -57,7 +60,7 @@ class SignIn extends StatelessWidget {
           },
         ),
         LoginProvider(
-          icon: FontAwesomeIcons.facebookF,
+          icon: Icons.facebook,
           label: 'Facebook',
           callback: () async {
             print('start facebook sign in');
@@ -67,7 +70,7 @@ class SignIn extends StatelessWidget {
           },
         ),
         LoginProvider(
-          icon: FontAwesomeIcons.linkedinIn,
+          icon: Icons.work,
           callback: () async {
             print('start linkdin sign in');
             await Future.delayed(Duration(seconds: 1));
@@ -76,7 +79,7 @@ class SignIn extends StatelessWidget {
           },
         ),
         LoginProvider(
-          icon: FontAwesomeIcons.githubAlt,
+          icon: Icons.code,
           callback: () async {
             print('start github sign in');
             await Future.delayed(Duration(seconds: 1));

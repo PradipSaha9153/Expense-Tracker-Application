@@ -1,12 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_lock/flutter_app_lock.dart';
-import 'package:flutter_screen_lock/configurations/input_button_config.dart';
-import 'package:flutter_screen_lock/configurations/screen_lock_config.dart';
-import 'package:flutter_screen_lock/configurations/secret_config.dart';
-import 'package:flutter_screen_lock/configurations/secrets_config.dart';
-import 'package:flutter_screen_lock/input_controller.dart';
-import 'package:flutter_screen_lock/screen_lock.dart';
+import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_assistant_2608/project/database_management/shared_preferences_services.dart';
 import 'package:money_assistant_2608/project/localization/methods.dart';
@@ -22,8 +16,7 @@ class MainLockScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenLock(
       correctString: sharedPrefs.passcodeScreenLock,
-      canCancel: false,
-      didUnlocked: () => AppLock.of(context)!.didUnlock(),
+      onUnlocked: () => AppLock.of(context)!.didUnlock(),
       deleteButton:
           const Icon(Icons.close, color: Color.fromRGBO(89, 129, 163, 1)),
       title: Padding(
@@ -40,7 +33,7 @@ class MainLockScreen extends StatelessWidget {
               fontSize: 20),
         ),
       ),
-      screenLockConfig: const ScreenLockConfig(
+      config: const ScreenLockConfig(
         backgroundColor: Color.fromRGBO(210, 234, 251, 1),
       ),
       secretsConfig: SecretsConfig(
@@ -48,10 +41,11 @@ class MainLockScreen extends StatelessWidget {
         borderColor: Color.fromRGBO(79, 94, 120, 1),
         enabledColor: Color.fromRGBO(89, 129, 163, 1),
       )),
-      inputButtonConfig: InputButtonConfig(
-        buttonStyle: OutlinedButton.styleFrom(
-          backgroundColor: Color.fromRGBO(71, 131, 192, 1),
-          //  Color.fromRGBO(89, 129, 163, 1)
+      keyPadConfig: KeyPadConfig(
+        buttonConfig: KeyPadButtonConfig(
+          buttonStyle: OutlinedButton.styleFrom(
+            backgroundColor: Color.fromRGBO(71, 131, 192, 1),
+          ),
         ),
       ),
     );
@@ -69,8 +63,7 @@ class OtherLockScreen extends StatelessWidget {
       context,
       'Please Enter Passcode',
     ));
-    return ScreenLock(
-      correctString: '',
+    return ScreenLock.create(
       title: Padding(
         padding: EdgeInsets.only(bottom: 10.h),
         child: Text(
@@ -96,11 +89,10 @@ class OtherLockScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
             fontSize: 20.sp),
       ),
-      confirmation: true,
       inputController: inputController,
       deleteButton:
           const Icon(Icons.close, color: Color.fromRGBO(71, 131, 192, 1)),
-      screenLockConfig: const ScreenLockConfig(
+      config: const ScreenLockConfig(
         backgroundColor: Color.fromRGBO(210, 234, 251, 1),
       ),
       secretsConfig: SecretsConfig(
@@ -108,16 +100,17 @@ class OtherLockScreen extends StatelessWidget {
         borderColor: Color.fromRGBO(79, 94, 120, 1),
         enabledColor: Color.fromRGBO(89, 129, 163, 1),
       )),
-      inputButtonConfig: InputButtonConfig(
-        buttonStyle: OutlinedButton.styleFrom(
-          backgroundColor: Color.fromRGBO(71, 131, 192, 1),
-          //  Color.fromRGBO(89, 129, 163, 1)
+      keyPadConfig: KeyPadConfig(
+        buttonConfig: KeyPadButtonConfig(
+          buttonStyle: OutlinedButton.styleFrom(
+            backgroundColor: Color.fromRGBO(71, 131, 192, 1),
+          ),
         ),
       ),
-      didConfirmed: (passCode) {
+      onConfirmed: (passCode) {
         sharedPrefs.passcodeScreenLock = passCode;
         Navigator.pop(context);
-      customToast(context,'Passcode has been enabled');
+        customToast(context, 'Passcode has been enabled');
       },
       cancelButton: TextButton(
           onPressed: () {
@@ -129,22 +122,6 @@ class OtherLockScreen extends StatelessWidget {
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                   color: Color.fromRGBO(71, 131, 192, 1)))),
-      // footer:  TextButton(
-      //   onPressed: () => inputController.unsetConfirmed(),
-      //   child: Padding(
-      //     padding:  EdgeInsets.only(top: 20.h),
-      //     child: Text(
-      //         getTranslated(
-      //               context,
-      //               'Return',
-      //             ) ??
-      //             'Return',
-      //         style: TextStyle(
-      //             color: Color.fromRGBO(71, 131, 192, 1),
-      //             fontWeight: FontWeight.w500,
-      //             fontSize: 20.sp)),
-      //   ),
-      // ),
     );
   }
 }

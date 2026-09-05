@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
@@ -18,7 +17,6 @@ import 'package:money_assistant_2608/project/localization/methods.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:io' show Platform;
 
-import '../classes/input_model.dart';
 import 'edit.dart';
 
 class Calendar extends StatelessWidget {
@@ -101,7 +99,6 @@ class _CalendarBodyState extends State<CalendarBody> {
               },
               child: SwipeActionCell(
                 key: ObjectKey(transactions[int]),
-                performsFirstActionWithFullSwipe: true,
                 trailingActions: <SwipeAction>[
                   SwipeAction(
                       title: getTranslated(context, 'Delete') ?? 'Delete',
@@ -372,6 +369,7 @@ class _CalendarBodyState extends State<CalendarBody> {
                       child: _buildEventsMarker(date, events),
                     );
                   }
+                  return null;
                 },
               ),
 
