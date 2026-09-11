@@ -12,6 +12,8 @@ import 'category_item.dart';
 import 'constants.dart';
 import 'custom_toast.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
 class SaveButton extends StatefulWidget {
   final bool saveInput;
   final Function? saveCategoryFunc;
@@ -26,31 +28,55 @@ class _SaveButtonState extends State<SaveButton> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ElevatedButton.icon(
-        onPressed: () {
-          if (widget.saveInput) {
-            saveInputFunc(context, widget.saveFunction!);
-          } else {
-            widget.saveCategoryFunc!();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-          backgroundColor: Color.fromRGBO(236, 158, 66, 1),
-          foregroundColor: white,
-          disabledForegroundColor: grey,
-          elevation: 10,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0.r),
+      child: Container(
+        height: 52.h,
+        width: 170.w,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF003830), Color(0xFF00695C)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(30.r),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0xFF003830).withOpacity(0.35),
+              blurRadius: 12,
+              offset: Offset(0, 6),
+            ),
+          ],
         ),
-        label: Text(
-          getTranslated(context, 'Save')!,
-          style: TextStyle(fontSize: 25.sp),
-        ),
-        icon: Icon(
-          Icons.save,
-          size: 25.sp,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(30.r),
+            onTap: () {
+              if (widget.saveInput) {
+                saveInputFunc(context, widget.saveFunction!);
+              } else {
+                widget.saveCategoryFunc!();
+              }
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.save_rounded,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  getTranslated(context, 'Save') ?? 'Save',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

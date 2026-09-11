@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_login/flutter_login.dart';
 
 import '../home.dart';
@@ -25,9 +26,17 @@ class SignIn extends StatelessWidget {
       bottom: Radius.circular(10.0),
       top: Radius.circular(20.0),
     );
-    return FlutterLogin(
-      logo: 'images/app_logo.png',
-      backgroundImage: 'images/login_bg.png',
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+      child: FlutterLogin(
+        logo: 'images/app_logo.png',
+        backgroundImage: 'images/login_bg.png',
       onSignup: _authenticateSignUp,
       onLogin: _authenticateUsers,
       onRecoverPassword: _onRecoverPassword,
@@ -51,7 +60,6 @@ class SignIn extends StatelessWidget {
       loginProviders: <LoginProvider>[
         LoginProvider(
           icon: Icons.g_mobiledata,
-          label: 'Google',
           callback: () async {
             print('start google sign in');
             await Future.delayed(Duration(seconds: 1));
@@ -61,7 +69,6 @@ class SignIn extends StatelessWidget {
         ),
         LoginProvider(
           icon: Icons.facebook,
-          label: 'Facebook',
           callback: () async {
             print('start facebook sign in');
             await Future.delayed(Duration(seconds: 1));
@@ -160,7 +167,8 @@ class SignIn extends StatelessWidget {
           // shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(55.0)),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 

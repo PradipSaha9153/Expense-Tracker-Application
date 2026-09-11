@@ -1,15 +1,13 @@
 import 'dart:core';
 import 'dart:io' show Platform;
 import 'package:day_night_time_picker/day_night_time_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:money_assistant_2608/project/app_pages/currency.dart';
 import 'package:money_assistant_2608/project/classes/alert_dialog.dart';
-import 'package:money_assistant_2608/project/classes/app_bar.dart';
 import 'package:money_assistant_2608/project/classes/category_item.dart';
 import 'package:money_assistant_2608/project/classes/constants.dart';
 import 'package:money_assistant_2608/project/classes/custom_toast.dart';
@@ -43,6 +41,8 @@ class _AddInputState extends State<AddInput> {
   static final _formKey1 = GlobalKey<FormState>(debugLabel: '_formKey1'),
       _formKey2 = GlobalKey<FormState>(debugLabel: '_formKey2');
 
+  String currentType = 'Expense';
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -55,33 +55,238 @@ class _AddInputState extends State<AddInput> {
           }
         }
       },
-      child: DefaultTabController(
-          initialIndex: 0,
-          length: 2,
-          child: Scaffold(
-              backgroundColor: blue1,
-              appBar: InExAppBar(true),
-              body:
-                  // ChangeNotifierProvider<ChangeModelType>(
-                  //     create: (context) => ChangeModelType(),
-                  //     child:
-                  PanelForKeyboard(
-                TabBarView(
-                  children: [
-                    AddEditInput(
-                      type: 'Expense',
-                      formKey: _formKey2,
+      child: Scaffold(
+        body: PanelForKeyboard(
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/login_bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Top Header Banner
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                getTranslated(context, 'Add Transaction') ?? 'Add Transaction',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 22.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                'Track today • Balance tomorrow',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 12.sp,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Image.asset(
+                            'images/app_icon.png',
+                            height: 42.r,
+                            width: 42.r,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
                     ),
-                    AddEditInput(
-                      type: 'Income',
-                      formKey: _formKey1,
-                    )
-                  ],
-                ),
-              ))),
-    )
-        // )
-        ;
+                  ),
+
+                  // Segmented Expense / Income Toggle
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                    child: Container(
+                      height: 60.h,
+                      padding: EdgeInsets.all(4.r),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE2F4EE),
+                        borderRadius: BorderRadius.circular(40.r),
+                      ),
+                      child: Row(
+                        children: [
+                          // Expense Tab
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  currentType = 'Expense';
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: Duration(milliseconds: 250),
+                                decoration: BoxDecoration(
+                                  gradient: currentType == 'Expense'
+                                      ? LinearGradient(
+                                          colors: [Color(0xFF00897B), Color(0xFF00564C)],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        )
+                                      : null,
+                                  borderRadius: BorderRadius.circular(36.r),
+                                  border: currentType == 'Expense'
+                                      ? Border.all(color: Colors.white.withOpacity(0.5), width: 1.5.w)
+                                      : null,
+                                  boxShadow: currentType == 'Expense'
+                                      ? [
+                                          BoxShadow(
+                                            color: Color(0xFF004D40).withOpacity(0.35),
+                                            blurRadius: 10,
+                                            offset: Offset(0, 4),
+                                          )
+                                        ]
+                                      : [],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 34.r,
+                                      height: 34.r,
+                                      decoration: BoxDecoration(
+                                        color: currentType == 'Expense'
+                                            ? Colors.white
+                                            : Color(0xFF80CBC4).withOpacity(0.4),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.south_west_rounded,
+                                        color: Color(0xFF00695C),
+                                        size: 18.sp,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Text(
+                                      'EXPENSE',
+                                      style: GoogleFonts.poppins(
+                                        color: currentType == 'Expense'
+                                            ? Colors.white
+                                            : Color(0xFF004D40),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // Income Tab
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  currentType = 'Income';
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: Duration(milliseconds: 250),
+                                decoration: BoxDecoration(
+                                  gradient: currentType == 'Income'
+                                      ? LinearGradient(
+                                          colors: [Color(0xFF00897B), Color(0xFF00564C)],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        )
+                                      : null,
+                                  borderRadius: BorderRadius.circular(36.r),
+                                  border: currentType == 'Income'
+                                      ? Border.all(color: Colors.white.withOpacity(0.5), width: 1.5.w)
+                                      : null,
+                                  boxShadow: currentType == 'Income'
+                                      ? [
+                                          BoxShadow(
+                                            color: Color(0xFF004D40).withOpacity(0.35),
+                                            blurRadius: 10,
+                                            offset: Offset(0, 4),
+                                          )
+                                        ]
+                                      : [],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 34.r,
+                                      height: 34.r,
+                                      decoration: BoxDecoration(
+                                        color: currentType == 'Income'
+                                            ? Colors.white
+                                            : Color(0xFF80CBC4).withOpacity(0.4),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.north_east_rounded,
+                                        color: Color(0xFF00695C),
+                                        size: 18.sp,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Text(
+                                      'INCOME',
+                                      style: GoogleFonts.poppins(
+                                        color: currentType == 'Income'
+                                            ? Colors.white
+                                            : Color(0xFF004D40),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Main Form Body
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: currentType == 'Expense'
+                          ? AddEditInput(
+                              type: 'Expense',
+                              formKey: _formKey2,
+                            )
+                          : AddEditInput(
+                              type: 'Income',
+                              formKey: _formKey1,
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -101,17 +306,14 @@ class PanelForKeyboard extends StatelessWidget {
     if (newText.length > 13) {
       newText = newText.substring(0, 13);
     }
-    // if input starts to have '.' => Don't need to reformat
     if (newText.contains('.')) {
       String fractionalNumber = newText.split('.').last;
-      // input can not have more than 2 numbers after a decimal point
       if (fractionalNumber.length > 2) {
         String wholeNumber = newText.split('.').first;
         newText = wholeNumber + '.' + fractionalNumber.substring(0, 2);
       }
 
       if (newText.substring(newText.length - 1) == '.') {
-        // input can not have more than 1 dot
         if ('.'.allMatches(newText).length == 2) {
           newText = newText.substring(0, newText.length - 1);
         }
@@ -122,7 +324,6 @@ class PanelForKeyboard extends StatelessWidget {
           format(double.parse(newText.replaceAll(',', '')));
     }
 
-    //define text input and cursor position
     textSelection = TextSelection.fromPosition(
         TextPosition(offset: _amountController.text.length));
     _amountController.selection = textSelection;
@@ -132,21 +333,17 @@ class PanelForKeyboard extends StatelessWidget {
     final text = _amountController.text;
     TextSelection textSelection = _amountController.selection;
 
-    // The cursor is at the beginning.
     if (textSelection.start == 0) {
       return;
     }
 
     final selectionLength = textSelection.end - textSelection.start;
-    // There is a selection.
     if (selectionLength > 0) {
       final newText = text.replaceRange(
         textSelection.start,
         textSelection.end,
         '',
       );
-      // if users delete all input or if input has '.'
-      // => Don't need to reformat when deleting
       if (newText == '' || newText.contains('.')) {
         _amountController.text = newText;
       } else {
@@ -160,7 +357,6 @@ class PanelForKeyboard extends StatelessWidget {
       return;
     }
 
-    // Delete the previous character
     final previousCodeUnit = text.codeUnitAt(textSelection.start - 1);
     final offset = _isUtf16Surrogate(previousCodeUnit) ? 2 : 1;
     final newStart = textSelection.start - offset;
@@ -190,7 +386,7 @@ class PanelForKeyboard extends StatelessWidget {
     return SlidingUpPanel(
         controller: _pc,
         minHeight: 0,
-        maxHeight: 300.h,
+        maxHeight: 350.h,
         parallaxEnabled: true,
         isDraggable: false,
         panelSnapping: true,
@@ -205,7 +401,6 @@ class PanelForKeyboard extends StatelessWidget {
             _backspace();
           },
           page: model.type == 'Income'
-              // Provider.of<ChangeModelType>(context).modelType == 'Income'
               ? IncomeCategory()
               : ExpenseCategory(),
         ),
@@ -224,53 +419,56 @@ class AddEditInput extends StatelessWidget {
     this.type,
     this.categoryIcon,
   });
+
   @override
   Widget build(BuildContext context) {
     if (this.inputModel != null) {
       model = this.inputModel!;
       defaultCategory = categoryItem(this.categoryIcon!, model.category!);
-      // Provider.of<ChangeModelType>(context, listen: false)
-      //     .changeModelType(this.inputModel!.type!);
     } else {
       model = InputModel(
         type: this.type,
       );
       defaultCategory = categoryItem(Icons.category_outlined, 'Category');
-      // Provider.of<ChangeModelType>(context, listen: false)
-      //     .changeModelType(this.type!);
     }
     return ChangeNotifierProvider<ChangeCategoryA>(
         create: (context) => ChangeCategoryA(),
-        child: ListView(children: [
-          AmountCard(),
-          SizedBox(
-            height: 30.h,
-          ),
-          Container(
-            decoration: BoxDecoration(
-                color: white,
-                border: Border.all(
-                  color: grey,
-                  width: 0.6.w,
-                )),
-            child: Column(
-              children: [
-                CategoryCard(),
-                DescriptionCard(),
-                DateCard(),
-              ],
+        child: Column(
+          children: [
+            AmountCard(),
+            SizedBox(height: 16.h),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 15,
+                    offset: Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  CategoryCard(),
+                  Divider(height: 1, color: Color(0xFFF0F0F0), indent: 70.w, endIndent: 20.w),
+                  DescriptionCard(),
+                  Divider(height: 1, color: Color(0xFFF0F0F0), indent: 70.w, endIndent: 20.w),
+                  DateCard(),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 70.h),
-            child: this.inputModel != null
+            SizedBox(height: 30.h),
+            this.inputModel != null
                 ? SaveAndDeleteButton(
                     saveAndDeleteInput: true,
                     formKey: this.formKey,
                   )
                 : SaveButton(true, null, true),
-          )
-        ]));
+            SizedBox(height: 20.h),
+          ],
+        ));
   }
 }
 
@@ -288,81 +486,122 @@ class _AmountCardState extends State<AmountCard> {
       text: model.id == null ? '' : format(model.amount!),
     );
   }
-  // @override
-  // void dispose(){
-  //   amountFocusNode!.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
-    Color colorMain = model.type == 'Income' ? green : red;
+    String currencySymbol = sharedPrefs.currencySymbol;
+    String currencyCode = 'INR';
+    try {
+      if (sharedPrefs.appCurrency.isNotEmpty) {
+        currencyCode = sharedPrefs.appCurrency.toUpperCase();
+      }
+    } catch (_) {}
+
     return Container(
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-          color: white,
-          border: Border(
-              bottom: BorderSide(
-            color: grey,
-            width: 0.6.h,
-          ))),
-      child: Padding(
-        padding:
-            EdgeInsets.only(top: 15.h, bottom: 30.h, right: 20.w, left: 20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${getTranslated(context, 'Amount')}',
-              style: TextStyle(
-                fontSize: 22.sp,
-              ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Amount',
+            style: GoogleFonts.poppins(
+              fontSize: 14.sp,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
             ),
-            TextFormField(
-              controller: _amountController,
-              readOnly: true,
-              showCursor: true,
-              maxLines: null,
-              minLines: 1,
-              // maxLength: ,
-              // inputFormatters: [
-              //   FilteringTextInputFormatter.allow(
-              //       RegExp(r'^\d*(.?|,?)\d{0,2}')),
-              // ],
-              onTap: () => _pc.open(),
-              cursorColor: colorMain,
-              style: GoogleFonts.aBeeZee(
-                  color: colorMain,
-                  fontSize: 35.sp,
-                  fontWeight: FontWeight.bold),
-              focusNode: amountFocusNode,
-              decoration: InputDecoration(
-                hintText: '0',
-                hintStyle: GoogleFonts.aBeeZee(
-                    color: colorMain,
-                    fontSize: 35.sp,
-                    fontWeight: FontWeight.bold),
-                icon: Padding(
-                  padding: EdgeInsets.only(right: 5.w),
-                  child: Icon(
-                    Icons.monetization_on,
-                    size: 45.sp,
-                    color: colorMain,
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              // Currency symbol circle badge
+              Container(
+                width: 44.r,
+                height: 44.r,
+                decoration: BoxDecoration(
+                  color: Color(0xFFE0F2F1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    currencySymbol,
+                    style: GoogleFonts.poppins(
+                      color: Color(0xFF00695C),
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                suffixIcon: _amountController.text.length > 0
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          size: 24.sp,
-                        ),
-                        onPressed: () {
-                          _amountController.clear();
-                        })
-                    : SizedBox(),
               ),
-            ),
-          ],
-        ),
+              SizedBox(width: 14.w),
+
+              // Amount Input Field
+              Expanded(
+                child: TextFormField(
+                  controller: _amountController,
+                  readOnly: true,
+                  showCursor: true,
+                  maxLines: 1,
+                  onTap: () => _pc.open(),
+                  cursorColor: Color(0xFF00695C),
+                  style: GoogleFonts.poppins(
+                    color: Colors.black87,
+                    fontSize: 32.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  focusNode: amountFocusNode,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: '0',
+                    hintStyle: GoogleFonts.poppins(
+                      color: Colors.black87,
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Currency code dropdown badge
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Currency()),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      currencyCode,
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[700],
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.grey[700],
+                      size: 20.sp,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -381,59 +620,76 @@ class _CategoryCardState extends State<CategoryCard> {
       var categoryItem = changeCategoryA.categoryItemA;
       model.category = categoryItem!.text;
       return GestureDetector(
-          onTap: () async {
-            if (_pc.isPanelOpen) {
-              _pc.close();
-            }
-            CategoryItem newCategoryItem = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => model.type == 'Income'
-                      ? IncomeCategory()
-                      : ExpenseCategory()),
-            );
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          if (_pc.isPanelOpen) {
+            _pc.close();
+          }
+          CategoryItem? newCategoryItem = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => model.type == 'Income'
+                  ? IncomeCategory()
+                  : ExpenseCategory(),
+            ),
+          );
+          if (newCategoryItem != null) {
             changeCategoryA.changeCategory(newCategoryItem);
-          },
-          child: Column(children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 20.w, right: 20.w, top: 20.h, bottom: 21.h),
-              child: Row(
-                children: [
-                  Icon(
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          child: Row(
+            children: [
+              Container(
+                width: 46.r,
+                height: 46.r,
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFEBEE),
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                child: Center(
+                  child: Icon(
                     iconData(categoryItem),
-                    size: 40.sp,
-                    color: model.type == 'Income' ? green : red,
+                    size: 24.sp,
+                    color: Color(0xFFFF5252),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 31.w),
-                      child: Text(
-                        getTranslated(context, categoryItem.text) ??
-                            categoryItem.text,
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Category',
+                      style: GoogleFonts.poppins(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                  ),
-                  // Spacer(),
-                  Icon(
-                    Icons.arrow_forward_ios_outlined,
-                    size: 20.sp,
-                  ),
-                ],
+                    SizedBox(height: 2.h),
+                    Text(
+                      getTranslated(context, categoryItem.text) ?? categoryItem.text,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13.sp,
+                        color: Colors.grey[500],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Divider(
-              height: 0,
-              thickness: 0.25.w,
-              color: grey,
-              indent: 85.w,
-            ),
-          ]));
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 22.sp,
+                color: Colors.grey[400],
+              ),
+            ],
+          ),
+        ),
+      );
     });
   }
 }
@@ -453,12 +709,6 @@ class _DescriptionCardState extends State<DescriptionCard> {
     descriptionController =
         TextEditingController(text: model.description ?? '');
   }
-
-  // @override
-  // void dispose(){
-  //   descriptionFocusNode!.dispose();
-  //   super.dispose();
-  // }
 
   KeyboardActionsConfig _buildConfig(BuildContext context) {
     return KeyboardActionsConfig(
@@ -490,29 +740,11 @@ class _DescriptionCardState extends State<DescriptionCard> {
                                     size: 25.sp, color: Colors.blueGrey),
                               ),
                             ),
-                            // GestureDetector(
-                            //   onTap: () {
-                            //     node.unfocus();
-                            //     Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //             builder: (context) => model.type == 'Income'
-                            //                 ? IncomeCategory()
-                            //                 : ExpenseCategory()));
-                            //   },
-                            //   child: Text(
-                            //     getTranslated(context, 'Choose Category')!,
-                            //     style: TextStyle(
-                            //         fontSize: 16.sp,
-                            //         fontWeight: FontWeight.bold,
-                            //         color: Colors.blueGrey),
-                            //   ),
-                            // ),
                             GestureDetector(
                                 onTap: () => node.unfocus(),
                                 child: Text(
-                                  getTranslated(context, "Done")!,
-                                  style: TextStyle(
+                                  getTranslated(context, "Done") ?? "Done",
+                                  style: GoogleFonts.poppins(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.blue),
@@ -533,60 +765,73 @@ class _DescriptionCardState extends State<DescriptionCard> {
       tapOutsideBehavior: TapOutsideBehavior.translucentDismiss,
       autoScroll: false,
       config: _buildConfig(context),
-      child: Column(children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.5.h),
-          child: TextFormField(
-            controller: descriptionController,
-            maxLines: null,
-            minLines: 1,
-            keyboardType: TextInputType.multiline,
-            keyboardAppearance: Brightness.light,
-            // maxLength: ,
-            onTap: () {
-              if (_pc.isPanelOpen) {
-                _pc.close();
-              }
-            },
-            cursorColor: blue1,
-            textCapitalization: TextCapitalization.sentences,
-            style: TextStyle(fontSize: 20.sp),
-            focusNode: descriptionFocusNode,
-            textInputAction: TextInputAction.newline,
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: getTranslated(context, 'Description'),
-                hintStyle: GoogleFonts.cousine(
-                  fontSize: 22.sp,
-                  fontStyle: FontStyle.italic,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Container(
+              width: 46.r,
+              height: 46.r,
+              decoration: BoxDecoration(
+                color: Color(0xFFE3F2FD),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.description_rounded,
+                  size: 24.sp,
+                  color: Color(0xFF42A5F5),
                 ),
-                suffixIcon: descriptionController.text.length > 0
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          size: 20.sp,
-                        ),
-                        onPressed: () {
-                          descriptionController.clear();
-                        })
-                    : SizedBox(),
-                icon: Padding(
-                  padding: EdgeInsets.only(right: 15.w),
-                  child: Icon(
-                    Icons.description_outlined,
-                    size: 40.sp,
-                    color: Colors.blueGrey,
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Description',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
-                )),
-          ),
+                  TextFormField(
+                    controller: descriptionController,
+                    maxLines: null,
+                    minLines: 1,
+                    keyboardType: TextInputType.multiline,
+                    keyboardAppearance: Brightness.light,
+                    onTap: () {
+                      if (_pc.isPanelOpen) {
+                        _pc.close();
+                      }
+                    },
+                    cursorColor: Color(0xFF00695C),
+                    textCapitalization: TextCapitalization.sentences,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13.sp,
+                      color: Colors.black87,
+                    ),
+                    focusNode: descriptionFocusNode,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 4.h),
+                      border: InputBorder.none,
+                      hintText: 'Add a note...',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 13.sp,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        Divider(
-          height: 0,
-          thickness: 0.25.w,
-          color: grey,
-          indent: 85.w,
-        )
-      ]),
+      ),
     );
   }
 }
@@ -605,102 +850,166 @@ class _DateCardState extends State<DateCard> {
       model.time = selectedTime.format(context);
     }
     return Padding(
-      padding:
-          EdgeInsets.only(left: 20.w, right: 20.w, top: 17.5.h, bottom: 19.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () {
-              if (_pc.isPanelOpen) {
-                _pc.close();
-              }
-              showDatePicker(
-                context: context,
-                initialDate: DateFormat('dd/MM/yyyy').parse(model.date!),
-                firstDate: DateTime(1990, 1, 1),
-                lastDate: DateTime(2050, 12, 31),
-                confirmText: getTranslated(context, 'OK') ?? 'OK',
-                cancelText: getTranslated(context, 'CANCEL'),
-                helpText: getTranslated(context, 'Select a date'),
-                builder: (context, child) {
-                  return Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: ColorScheme.light(
-                        primary: blue3,
-                        onPrimary: Colors.black,
-                        onSurface: Colors.black,
-                      ),
-                      textButtonTheme: TextButtonThemeData(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Color.fromRGBO(80, 157, 253, 1),
+          // Date Section
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (_pc.isPanelOpen) {
+                  _pc.close();
+                }
+                showDatePicker(
+                  context: context,
+                  initialDate: DateFormat('dd/MM/yyyy').parse(model.date!),
+                  firstDate: DateTime(1990, 1, 1),
+                  lastDate: DateTime(2050, 12, 31),
+                  confirmText: getTranslated(context, 'OK') ?? 'OK',
+                  cancelText: getTranslated(context, 'CANCEL'),
+                  helpText: getTranslated(context, 'Select a date'),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: ColorScheme.light(
+                          primary: Color(0xFF00695C),
+                          onPrimary: Colors.white,
+                          onSurface: Colors.black,
                         ),
                       ),
+                      child: child!,
+                    );
+                  },
+                ).then((value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedDate = value;
+                      model.date = DateFormat('dd/MM/yyyy').format(value);
+                    });
+                  }
+                });
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 44.r,
+                    height: 44.r,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: child!,
-                  );
-                },
-              ).then((value) {
-                if (value != null) {
-                  setState(() {
-                    selectedDate = value;
-                    model.date = DateFormat('dd/MM/yyyy').format(value);
-                  });
-                }
-              });
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 30.w),
-                  child: Icon(
-                    Icons.event,
-                    size: 40.sp,
-                    color: Colors.blue,
+                    child: Center(
+                      child: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20.sp,
+                        color: Color(0xFF66BB6A),
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  DateFormat(sharedPrefs.dateFormat).format(
-                      DateFormat('dd/MM/yyyy').parse(
-                          model.date!)),
-                  style: GoogleFonts.aBeeZee(
-                    fontSize: 21.5.sp,
+                  SizedBox(width: 10.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Date',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.sp,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        DateFormat(sharedPrefs.dateFormat).format(
+                            DateFormat('dd/MM/yyyy').parse(model.date!)),
+                        style: GoogleFonts.poppins(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Spacer(),
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              if (_pc.isPanelOpen) {
-                _pc.close();
-              }
-              Navigator.of(context).push(
-                showPicker(
-                    cancelText: getTranslated(context, 'Cancel') ?? 'Cancel',
-                    okText: getTranslated(context, 'Ok') ?? 'Ok',
-                    unselectedColor: grey,
-                    dialogInsetPadding: EdgeInsets.symmetric(
-                        horizontal: 50.w, vertical: 30.0.h),
-                    elevation: 12,
-                    context: context,
-                    value: Time(hour: selectedTime.hour, minute: selectedTime.minute),
-                    is24HrFormat: true,
-                    onChange: (value) => setState(() {
-                          selectedTime = TimeOfDay(hour: value.hour, minute: value.minute);
-                          model.time = selectedTime.format(context);
-                        })),
-              );
-            },
-            child: Text(
-              model.time!,
-              style: GoogleFonts.aBeeZee(
-                fontSize: 21.5.sp,
+                ],
               ),
             ),
-          )
+          ),
+
+          Container(
+            height: 35.h,
+            width: 1.w,
+            color: Color(0xFFF0F0F0),
+          ),
+          SizedBox(width: 12.w),
+
+          // Time Section
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (_pc.isPanelOpen) {
+                  _pc.close();
+                }
+                Navigator.of(context).push(
+                  showPicker(
+                      cancelText: getTranslated(context, 'Cancel') ?? 'Cancel',
+                      okText: getTranslated(context, 'Ok') ?? 'Ok',
+                      unselectedColor: grey,
+                      dialogInsetPadding: EdgeInsets.symmetric(
+                          horizontal: 50.w, vertical: 30.0.h),
+                      elevation: 12,
+                      context: context,
+                      value: Time(hour: selectedTime.hour, minute: selectedTime.minute),
+                      is24HrFormat: true,
+                      onChange: (value) => setState(() {
+                            selectedTime = TimeOfDay(hour: value.hour, minute: value.minute);
+                            model.time = selectedTime.format(context);
+                          })),
+                );
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 44.r,
+                    height: 44.r,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF3E5F5),
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.access_time_rounded,
+                        size: 20.sp,
+                        color: Color(0xFFAB47BC),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Time',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.sp,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        model.time!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -1,13 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:money_assistant_2608/project/classes/app_bar.dart';
 import 'package:money_assistant_2608/project/classes/category_item.dart';
 import 'package:money_assistant_2608/project/classes/chart_pie.dart';
 import 'package:money_assistant_2608/project/classes/constants.dart';
-import 'package:money_assistant_2608/project/classes/dropdown_box.dart';
 import 'package:money_assistant_2608/project/classes/input_model.dart';
 import 'package:money_assistant_2608/project/database_management/shared_preferences_services.dart';
 import 'package:money_assistant_2608/project/database_management/sqflite_services.dart';
@@ -34,491 +31,894 @@ class Analysis extends StatefulWidget {
 }
 
 class _AnalysisState extends State<Analysis> {
+  String currentType = 'Expense';
+  bool isAmountMode = true; // true = Amount, false = Percentage
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ChangeSelectedDate>(
       create: (context) => ChangeSelectedDate(),
-      child: DefaultTabController(
-        initialIndex: 0,
-        length: 2,
-        child: Scaffold(
-            backgroundColor: blue1,
-            appBar: InExAppBar(false),
-            body: Selector<ChangeSelectedDate, String?>(
-                selector: (_, changeSelectedDate) =>
-                    changeSelectedDate.selectedAnalysisDate,
-                builder: (context, selectedAnalysisDate, child) {
-                  selectedAnalysisDate ??= sharedPrefs.selectedDate;
-                  ListView listViewChild(String type) => ListView(
-                        children: [
-                          ShowDate(true, selectedAnalysisDate!),
-                          ShowDetails(type, selectedAnalysisDate),
-                        ],
-                      );
-                  return TabBarView(
-                    children: [
-                      listViewChild('Expense'),
-                      listViewChild('Income')
-                    ],
-                  );
-                })),
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('images/analysis_bg.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+            child: Selector<ChangeSelectedDate, String?>(
+              selector: (_, changeSelectedDate) =>
+                  changeSelectedDate.selectedAnalysisDate,
+              builder: (context, selectedAnalysisDate, child) {
+                selectedAnalysisDate ??= sharedPrefs.selectedDate;
+
+                return Column(
+                  children: [
+                    // Top Segmented Toggle Switch (EXPENSE / INCOME)
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: Container(
+                        height: 56.h,
+                        padding: EdgeInsets.all(4.r),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE2F4EE),
+                          borderRadius: BorderRadius.circular(35.r),
+                        ),
+                        child: Row(
+                          children: [
+                            // Expense Tab
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    currentType = 'Expense';
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 250),
+                                  decoration: BoxDecoration(
+                                    gradient: currentType == 'Expense'
+                                        ? LinearGradient(
+                                            colors: [Color(0xFF00897B), Color(0xFF00564C)],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          )
+                                        : null,
+                                    borderRadius: BorderRadius.circular(36.r),
+                                    border: currentType == 'Expense'
+                                        ? Border.all(color: Colors.white.withOpacity(0.5), width: 1.5.w)
+                                        : null,
+                                    boxShadow: currentType == 'Expense'
+                                        ? [
+                                            BoxShadow(
+                                              color: Color(0xFF004D40).withOpacity(0.35),
+                                              blurRadius: 10,
+                                              offset: Offset(0, 4),
+                                            )
+                                          ]
+                                        : [],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 32.r,
+                                        height: 32.r,
+                                        decoration: BoxDecoration(
+                                          color: currentType == 'Expense'
+                                              ? Colors.white
+                                              : Color(0xFF80CBC4).withOpacity(0.4),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.south_west_rounded,
+                                          color: Color(0xFF00695C),
+                                          size: 16.sp,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        'EXPENSE',
+                                        style: GoogleFonts.poppins(
+                                          color: currentType == 'Expense'
+                                              ? Colors.white
+                                              : Color(0xFF004D40),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Income Tab
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    currentType = 'Income';
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 250),
+                                  decoration: BoxDecoration(
+                                    gradient: currentType == 'Income'
+                                        ? LinearGradient(
+                                            colors: [Color(0xFF00897B), Color(0xFF00564C)],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          )
+                                        : null,
+                                    borderRadius: BorderRadius.circular(36.r),
+                                    border: currentType == 'Income'
+                                        ? Border.all(color: Colors.white.withOpacity(0.5), width: 1.5.w)
+                                        : null,
+                                    boxShadow: currentType == 'Income'
+                                        ? [
+                                            BoxShadow(
+                                              color: Color(0xFF004D40).withOpacity(0.35),
+                                              blurRadius: 10,
+                                              offset: Offset(0, 4),
+                                            )
+                                          ]
+                                        : [],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 32.r,
+                                        height: 32.r,
+                                        decoration: BoxDecoration(
+                                          color: currentType == 'Income'
+                                              ? Colors.white
+                                              : Color(0xFF80CBC4).withOpacity(0.4),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.north_east_rounded,
+                                          color: Color(0xFF00695C),
+                                          size: 16.sp,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        'INCOME',
+                                        style: GoogleFonts.poppins(
+                                          color: currentType == 'Income'
+                                              ? Colors.white
+                                              : Color(0xFF004D40),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Scrollable Main Analysis Dashboard Content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
+                        child: Column(
+                          children: [
+                            // Date Filter Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                DateFilterDropdown(
+                                  selectedDate: selectedAnalysisDate!,
+                                  onDateChanged: (newDate) {
+                                    context
+                                        .read<ChangeSelectedDate>()
+                                        .changeSelectedAnalysisDate(
+                                            newSelectedDate: newDate);
+                                    sharedPrefs.selectedDate = newDate;
+                                  },
+                                ),
+                                DateFilterDropdown(
+                                  selectedDate: 'All',
+                                  onDateChanged: (_) {},
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 14.h),
+
+                            // Main Dashboard Content FutureBuilder
+                            ShowDashboardDetails(
+                              type: currentType,
+                              selectedDate: selectedAnalysisDate,
+                              isAmountMode: isAmountMode,
+                              onModeToggle: (isAmount) {
+                                setState(() {
+                                  isAmountMode = isAmount;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class ShowDate extends StatelessWidget {
-  final bool forAnalysis;
+class DateFilterDropdown extends StatelessWidget {
   final String selectedDate;
-  const ShowDate(this.forAnalysis, this.selectedDate);
+  final ValueChanged<String> onDateChanged;
+
+  const DateFilterDropdown({
+    required this.selectedDate,
+    required this.onDateChanged,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10.w,
-          vertical: 25.h,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today,
-              size: 27.sp,
-              color: Color.fromRGBO(82, 179, 252, 1),
+    return Container(
+      height: 40.h,
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      decoration: BoxDecoration(
+        color: Color(0xFFE2F4EE),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: timeline.contains(selectedDate) ? selectedDate : 'All',
+          icon: Padding(
+            padding: EdgeInsets.only(left: 6.w),
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 20.sp,
+              color: Color(0xFF00695C),
             ),
-            SizedBox(
-              width: 10.w,
-            ),
-            DateDisplay(this.selectedDate),
-            Spacer(),
-            DropDownBox(this.forAnalysis, this.selectedDate)
-          ],
-        ));
-  }
-}
-
-class DateDisplay extends StatelessWidget {
-  final String selectedDate;
-  DateDisplay(this.selectedDate);
-
-  @override
-  Widget build(BuildContext context) {
-    final String today = DateFormat(sharedPrefs.dateFormat).format(todayDT);
-    String since = getTranslated(context, 'Since')!;
-    TextStyle style =
-        GoogleFonts.aBeeZee(fontSize: 20.sp, fontWeight: FontWeight.bold);
-
-    Map<String, Widget> dateMap = {
-      'Today': Text('$today', style: style),
-      'This week': Text(
-        '$since ${DateFormat(sharedPrefs.dateFormat).format(startOfThisWeek)}',
-        style: style,
-      ),
-      'This month': Text(
-          '$since ${DateFormat(sharedPrefs.dateFormat).format(startOfThisMonth)}',
-          style: style),
-      'This quarter': Text(
-        '$since ${DateFormat(sharedPrefs.dateFormat).format(startOfThisQuarter)}',
-        style: style,
-      ),
-      'This year': Text(
-        '$since ${DateFormat(sharedPrefs.dateFormat).format(startOfThisYear)}',
-        style: style,
-      ),
-      'All': Text('${getTranslated(context, 'All')!}', style: style)
-    };
-    var dateListKey = dateMap.keys.toList();
-    var dateListValue = dateMap.values.toList();
-
-    for (int i = 0; i < dateListKey.length; i++) {
-      if (selectedDate == dateListKey[i]) {
-        return dateListValue[i];
-      }
-    }
-    return Container();
-  }
-}
-
-class ShowMoneyFrame extends StatelessWidget {
-  final String type;
-  final double typeValue, balance;
-  const ShowMoneyFrame(this.type, this.typeValue, this.balance);
-
-  @override
-  Widget build(BuildContext context) {
-    Widget rowFrame(String typeName, double value) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            getTranslated(context, typeName)!,
-            style: TextStyle(fontSize: 22.sp),
           ),
+          style: GoogleFonts.poppins(
+            color: Color(0xFF004D40),
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+          ),
+          dropdownColor: Colors.white,
+          onChanged: (value) {
+            if (value != null) {
+              onDateChanged(value);
+            }
+          },
+          items: timeline.map((time) {
+            return DropdownMenuItem<String>(
+              value: time,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 16.sp,
+                    color: Color(0xFF00695C),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(getTranslated(context, time) ?? time),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class SummaryCard extends StatelessWidget {
+  final String type;
+  final double typeValue;
+  final double balance;
+
+  const SummaryCard({
+    required this.type,
+    required this.typeValue,
+    required this.balance,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Type Section (Expense / Income)
           Expanded(
-            child: Text(
-              format(value) + ' ' + currency,
-              style: GoogleFonts.aBeeZee(
-                  fontSize: format(value.toDouble()).length > 22
-                      ? 16.5.sp
-                      : format(value.toDouble()).length > 17
-                          ? 19.5.sp
-                          : 22.sp),
-              // fix here: Overflow is a temporary parameter, fix whatever it is so that the money value will never overflow
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.end,
+            child: Row(
+              children: [
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE0F2F1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      type == 'Income'
+                          ? Icons.account_balance_wallet_rounded
+                          : Icons.account_balance_wallet_rounded,
+                      size: 22.sp,
+                      color: Color(0xFF00695C),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        type == 'Income' ? 'Income' : 'Expense',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '${format(typeValue)} $currency',
+                          style: GoogleFonts.poppins(
+                            color: Colors.black87,
+                            fontSize: 19.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Vertical Divider Line
+          Container(
+            height: 38.h,
+            width: 1.w,
+            color: Color(0xFFEEEEEE),
+          ),
+          SizedBox(width: 14.w),
+
+          // Balance Section
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE8F5E9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.savings_rounded,
+                      size: 22.sp,
+                      color: Color(0xFF4CAF50),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Balance',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '${format(balance)} $currency',
+                          style: GoogleFonts.poppins(
+                            color: Colors.black87,
+                            fontSize: 19.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-          color: Color.fromRGBO(239, 247, 253, 1),
-          borderRadius: BorderRadius.circular(40.r),
-          border: Border.all(
-            color: grey,
-            width: 0.4.w,
-          )),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.5.h),
-        child: Column(
-          children: [
-            rowFrame(this.type, typeValue),
-            SizedBox(
-              height: 12.5.h,
-            ),
-            rowFrame('Balance', this.balance)
-          ],
-        ),
       ),
     );
   }
 }
 
-class ShowDetails extends StatefulWidget {
-  final String type, selectedDate;
-  ShowDetails(this.type, this.selectedDate);
+class ShowDashboardDetails extends StatelessWidget {
+  final String type;
+  final String selectedDate;
+  final bool isAmountMode;
+  final ValueChanged<bool> onModeToggle;
 
-  @override
-  _ShowDetailsState createState() => _ShowDetailsState();
-}
-
-class _ShowDetailsState extends State<ShowDetails> {
-  Widget showInExDetails(
-    BuildContext context,
-    List<InputModel> transactionsSorted,
-  ) {
-    List<CategoryItem> itemList = widget.type == 'Income'
-        ? createItemList(
-            transactions: transactionsSorted,
-            forAnalysisPage: true,
-            isIncomeType: true,
-            forSelectIconPage: false)
-        : createItemList(
-            transactions: transactionsSorted,
-            forAnalysisPage: true,
-            isIncomeType: false,
-            forSelectIconPage: false);
-
-    return Column(
-        children: List.generate(itemList.length, (int) {
-      return
-          // SwipeActionCell(
-          // backgroundColor: Colors.transparent,
-          //   key: ObjectKey(transactionsSorted[int]),
-          //   performsFirstActionWithFullSwipe: true,
-          //   trailingActions: <SwipeAction>[
-          //     SwipeAction(
-          //         title: "Delete",
-          //         onTap: (CompletionHandler handler) async {
-          //           Future<void> onDeletion() async {
-          //             await handler(true);
-          //             transactionsSorted.removeAt(int);
-          //             customToast(context, 'Transactions has been deleted');
-          //             setState(() {});
-          //           }
-          //
-          //           Platform.isIOS
-          //               ? await iosDialog(
-          //                   context,
-          //                   'Deleted data can not be recovered. Are you sure you want to Delete All Transactions In This Category?',
-          //                   'Delete',
-          //                   onDeletion)
-          //               : await androidDialog(
-          //                   context,
-          //                   'Deleted data can not be recovered. Are you sure you want to Delete All Transactions In This Category?',
-          //                   'Delete',
-          //                   onDeletion);
-          //         },
-          //         color: red),
-          //   ], child:
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Report(
-                              type: widget.type,
-                              category: itemList[int].text,
-                              selectedDate: widget.selectedDate,
-                              icon: iconData(itemList[int]),
-                            ))).then((value) => setState(() {}));
-              },
-              child: CategoryDetails(
-                  widget.type,
-                  getTranslated(context, itemList[int].text) ??
-                      itemList[int].text,
-                  transactionsSorted[int].amount!,
-                  transactionsSorted[int].color,
-                  iconData(itemList[int]),
-                  false));
-    }));
-  }
+  const ShowDashboardDetails({
+    required this.type,
+    required this.selectedDate,
+    required this.isAmountMode,
+    required this.onModeToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
     late Map<String, double> chartDataMap;
+
     return FutureBuilder<List<InputModel>>(
-        initialData: [],
-        future: DB.inputModelList(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<InputModel>> snapshot) {
-          connectionUI(snapshot);
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return ShowNullDetail(0, null, this.widget.type, false);
+      initialData: [],
+      future: DB.inputModelList(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        double calcIncome = 0.0;
+        double calcExpense = 0.0;
+        double calcBalance = 0.0;
+        List<InputModel> allTransactions = [];
+
+        if (snapshot.hasData && snapshot.data != null) {
+          allTransactions = filterData(context, snapshot.data!, selectedDate);
+
+          if (allTransactions.isNotEmpty) {
+            for (var tx in allTransactions) {
+              final amt = tx.amount;
+              if (amt != null) {
+                if (tx.type == 'Income') {
+                  calcIncome += amt;
+                } else if (tx.type == 'Expense') {
+                  calcExpense += amt;
+                }
+              }
+            }
+            calcBalance = calcIncome - calcExpense;
+
+            allTransactions = allTransactions
+                .where((d) => d.type == type)
+                .toList();
           }
-          if (snapshot.data == null) {
-            return ShowNullDetail(0, chartDataNull, this.widget.type, true);
+        }
+
+        double totalTypeAmount = type == 'Income' ? calcIncome : calcExpense;
+
+        if (allTransactions.isEmpty) {
+          return Column(
+            children: [
+              SummaryCard(type: type, typeValue: 0.0, balance: calcBalance),
+              SizedBox(height: 16.h),
+              _buildBreakdownHeader(),
+              SizedBox(
+                height: 280.h,
+                child: ChartPie(
+                  chartDataNull,
+                  totalAmount: 0.0,
+                  type: type,
+                  showPercentage: !isAmountMode,
+                ),
+              ),
+              _buildCategoryHeader(context),
+              SizedBox(height: 8.h),
+              CategoryWiseCard(
+                type: type,
+                category: getTranslated(context, 'Category') ?? 'Category',
+                amount: 0.0,
+                totalAmount: 0.0,
+                color: type == 'Income' ? green : red,
+                icon: Icons.category_outlined,
+                forNullDetail: true,
+                onTap: () {},
+              ),
+              SizedBox(height: 30.h),
+            ],
+          );
+        }
+
+        List<InputModel> transactionsSorted = [
+          InputModel(
+            type: type,
+            amount: allTransactions[0].amount,
+            category: allTransactions[0].category,
+          )
+        ];
+
+        int i = 1;
+        while (i < allTransactions.length) {
+          allTransactions.sort((a, b) => a.category!.compareTo(b.category!));
+
+          double currAmt = allTransactions[i].amount ?? 0;
+          double prevAmt = allTransactions[i - 1].amount ?? 0;
+
+          if (i == 1) {
+            chartDataMap = {
+              allTransactions[0].category!: allTransactions[0].amount ?? 0
+            };
+          }
+
+          if (allTransactions[i].category == allTransactions[i - 1].category) {
+            chartDataMap.update(
+              allTransactions[i].category!,
+              (value) => value + currAmt,
+              ifAbsent: () => prevAmt + currAmt,
+            );
+            i++;
           } else {
-            double income = 0, expense = 0, balance = 0;
+            chartDataMap.addAll({
+              allTransactions[i].category!: currAmt
+            });
+            i++;
+          }
 
-            List<InputModel> allTransactions =
-                filterData(context, snapshot.data!, widget.selectedDate);
+          transactionsSorted = chartDataMap.entries
+              .map((entry) => InputModel(
+                    type: type,
+                    category: entry.key,
+                    amount: entry.value,
+                  ))
+              .toList();
+        }
 
-            if (allTransactions.length > 0) {
-              //prepare for MoneyFrame
-
-              List<double?> incomeList = [], expenseList = [];
-              incomeList = allTransactions
-                  .map((data) {
-                    if (data.type == 'Income') {
-                      return data.amount;
-                    }
-                  })
-                  .where((element) => element != null)
-                  .toList();
-
-              expenseList = allTransactions
-                  .map((data) {
-                    if (data.type == 'Expense') {
-                      return data.amount;
-                    }
-                  })
-                  .where((element) => element != null)
-                  .toList();
-
-              if (incomeList.length > 0) {
-                for (int i = 0; i < incomeList.length; i++) {
-                  income = income + incomeList[i]!;
-                }
-              }
-              if (expenseList.length > 0) {
-                for (int i = 0; i < expenseList.length; i++) {
-                  expense = expense + expenseList[i]!;
-                }
-              }
-              balance = income - expense;
-
-              // prepare for InExDetails
-              if (this.widget.type == 'Income') {
-                allTransactions = allTransactions
-                    .map((data) {
-                      if (data.type == 'Income') {
-                        return inputModel(data);
-                      }
-                    })
-                    .where((element) => element != null)
-                    .cast<InputModel>()
-                    .toList();
-              } else {
-                allTransactions = allTransactions
-                    .map((data) {
-                      if (data.type == 'Expense') {
-                        return inputModel(data);
-                      }
-                    })
-                    .where((element) => element != null)
-                    .cast<InputModel>()
-                    .toList();
-              }
-            }
-
-            if (allTransactions.length == 0) {
-              return ShowNullDetail(
-                  balance, chartDataNull, this.widget.type, true);
-            } else {
-              List<InputModel> transactionsSorted = [
-                InputModel(
-                  type: this.widget.type,
-                  amount: allTransactions[0].amount,
-                  category: allTransactions[0].category,
-                )
-              ];
-
-              int i = 1;
-              //cmt: chartDataListDetailed.length must be greater than 2 to execute
-              while (i < allTransactions.length) {
-                allTransactions
-                    .sort((a, b) => a.category!.compareTo(b.category!));
-
-                if (i == 1) {
-                  chartDataMap = {
-                    allTransactions[0].category!: allTransactions[0].amount!
-                  };
-                }
-
-                if (allTransactions[i].category ==
-                    allTransactions[i - 1].category) {
-                  chartDataMap.update(allTransactions[i].category!,
-                      (value) => (value + allTransactions[i].amount!),
-                      ifAbsent: () => (allTransactions[i - 1].amount! +
-                          allTransactions[i].amount!));
-                  i++;
-                } else {
-                  chartDataMap.addAll({
-                    allTransactions[i].category!: allTransactions[i].amount!
-                  });
-
-                  i++;
-                }
-                transactionsSorted = chartDataMap.entries
-                    .map((entry) => InputModel(
-                          type: this.widget.type,
-                          category: entry.key,
-                          amount: entry.value,
-                        ))
-                    .toList();
-              }
-
-              void recurringFunc({required int i, n}) {
-                if (n > i) {
-                  for (int c = 1; c <= n - i; c++) {
-                    transactionsSorted[i + c - 1].color = chartPieColors[c - 1];
-                    recurringFunc(i: i, n: c);
-                  }
-                }
-              }
-
-              for (int n = 1; n <= transactionsSorted.length; n++) {
-                transactionsSorted[n - 1].color = chartPieColors[n - 1];
-                recurringFunc(i: chartPieColors.length, n: n);
-              }
-              return Column(
-                children: [
-                  ShowMoneyFrame(this.widget.type,
-                      this.widget.type == 'Income' ? income : expense, balance),
-                  SizedBox(height: 360.h, child: ChartPie(transactionsSorted)),
-                  showInExDetails(
-                    context,
-                    // sum value of transactions having a same category to one
-                    transactionsSorted,
-                  )
-                ],
-              );
+        void recurringFunc({required int i, n}) {
+          if (n > i) {
+            for (int c = 1; c <= n - i; c++) {
+              transactionsSorted[i + c - 1].color = chartPieColors[c - 1];
+              recurringFunc(i: i, n: c);
             }
           }
-        });
-  }
-}
+        }
 
-class ShowNullDetail extends StatelessWidget {
-  final double balanceValue;
-  final List<InputModel>? chartData;
-  final String type;
-  final bool connection;
-  ShowNullDetail(this.balanceValue, this.chartData, this.type, this.connection);
-  @override
-  Widget build(BuildContext context) {
-    return Column(
+        for (int n = 1; n <= transactionsSorted.length; n++) {
+          transactionsSorted[n - 1].color = chartPieColors[n - 1];
+          recurringFunc(i: chartPieColors.length, n: n);
+        }
+
+        // Generate category list items
+        List<CategoryItem> itemList = createItemList(
+          transactions: transactionsSorted,
+          forAnalysisPage: true,
+          isIncomeType: type == 'Income',
+          forSelectIconPage: false,
+        );
+
+        return Column(
+          children: [
+            SummaryCard(
+              type: type,
+              typeValue: totalTypeAmount,
+              balance: calcBalance,
+            ),
+            SizedBox(height: 18.h),
+
+            // Expense / Income Breakdown Header & Switch
+            _buildBreakdownHeader(),
+            SizedBox(height: 10.h),
+
+            // Center Donut Chart
+            SizedBox(
+              height: 280.h,
+              child: ChartPie(
+                transactionsSorted,
+                totalAmount: totalTypeAmount,
+                type: type,
+                showPercentage: !isAmountMode,
+              ),
+            ),
+            SizedBox(height: 10.h),
+
+            // Category Wise Header
+            _buildCategoryHeader(context),
+            SizedBox(height: 10.h),
+
+            // Category List Cards
+            ...List.generate(itemList.length, (idx) {
+              var item = itemList[idx];
+              double catAmount = transactionsSorted[idx].amount ?? 0.0;
+              Color catColor = transactionsSorted[idx].color ?? Color(0xFF00695C);
+
+              return Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
+                child: CategoryWiseCard(
+                  type: type,
+                  category: getTranslated(context, item.text) ?? item.text,
+                  amount: catAmount,
+                  totalAmount: totalTypeAmount,
+                  color: catColor,
+                  icon: iconData(item),
+                  forNullDetail: false,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Report(
+                          type: type,
+                          category: item.text,
+                          selectedDate: selectedDate,
+                          icon: iconData(item),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
+            SizedBox(height: 30.h),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBreakdownHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        ShowMoneyFrame(this.type, 0, this.balanceValue),
-        SizedBox(
-            height: 360.h,
-            child: connection == false ? null : ChartPie(this.chartData!)),
-        CategoryDetails(
-            this.type,
-            getTranslated(context, 'Category') ?? 'Category',
-            0,
-            this.type == 'Income' ? green : red,
-            Icons.category_outlined,
-            true)
+        Text(
+          type == 'Income' ? 'Income Breakdown' : 'Expense Breakdown',
+          style: GoogleFonts.poppins(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        // Amount / Percentage Toggle Pill
+        Container(
+          height: 36.h,
+          padding: EdgeInsets.all(3.r),
+          decoration: BoxDecoration(
+            color: Color(0xFFE0F2F1),
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => onModeToggle(true),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: isAmountMode ? Color(0xFF00695C) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Text(
+                    'Amount',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: isAmountMode ? FontWeight.bold : FontWeight.w500,
+                      color: isAmountMode ? Colors.white : Color(0xFF004D40),
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => onModeToggle(false),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: !isAmountMode ? Color(0xFF00695C) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Text(
+                    'Percentage',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: !isAmountMode ? FontWeight.bold : FontWeight.w500,
+                      color: !isAmountMode ? Colors.white : Color(0xFF004D40),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Category Wise',
+          style: GoogleFonts.poppins(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        TextButton(
+          onPressed: () {},
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Row(
+            children: [
+              Text(
+                'See All',
+                style: GoogleFonts.poppins(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF00695C),
+                ),
+              ),
+              SizedBox(width: 2.w),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18.sp,
+                color: Color(0xFF00695C),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 }
 
-class CategoryDetails extends StatelessWidget {
-  final String type, category;
+class CategoryWiseCard extends StatelessWidget {
+  final String type;
+  final String category;
   final double amount;
-  final Color? color;
+  final double totalAmount;
+  final Color color;
   final IconData icon;
   final bool forNullDetail;
-  CategoryDetails(this.type, this.category, this.amount, this.color, this.icon,
-      this.forNullDetail);
+  final VoidCallback onTap;
+
+  const CategoryWiseCard({
+    required this.type,
+    required this.category,
+    required this.amount,
+    required this.totalAmount,
+    required this.color,
+    required this.icon,
+    required this.forNullDetail,
+    required this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-        color: white,
-        elevation: 3,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                this.icon,
-                color: forNullDetail
-                    ? this.type == 'Income'
-                        ? green
-                        : red
-                    : this.color,
-                size: 23.sp,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 15.w, right: 10.w),
-                  child: Text(
-                    this.category,
-                    style: TextStyle(fontSize: 20.sp),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.start,
+    double percentage = totalAmount > 0 ? (amount / totalAmount) * 100 : 0.0;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18.r),
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                // Category Icon Badge
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      icon,
+                      color: color,
+                      size: 22.sp,
+                    ),
                   ),
                 ),
-              ),
-              // attention: This widget will never overflow
-              Flexible(
-                flex: 0,
-                child: Text(
-                  // '${this.color!.red},' + '${this.color!.green},' + '${this.color!.blue},',
-                  format(amount) + ' ' + currency,
-                  style: GoogleFonts.aBeeZee(fontSize: 20.sp),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                ),
-              ),
-              SizedBox(
-                width: 10.w,
-              ),
-              forNullDetail
-                  ? SizedBox()
-                  : Icon(
-                      Icons.arrow_forward_ios,
-                      size: 18.sp,
+                SizedBox(width: 14.w),
+
+                // Category Name
+                Expanded(
+                  child: Text(
+                    category,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
-            ],
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                // Amount
+                Text(
+                  '${format(amount)} $currency',
+                  style: GoogleFonts.poppins(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(width: 10.w),
+
+                // Percentage Badge
+                if (!forNullDetail)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Text(
+                      '${percentage.toStringAsFixed(1)}%',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ),
+
+                if (!forNullDetail) SizedBox(width: 6.w),
+
+                // Chevron Right
+                if (!forNullDetail)
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: 20.sp,
+                    color: Colors.grey[400],
+                  ),
+              ],
+            ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

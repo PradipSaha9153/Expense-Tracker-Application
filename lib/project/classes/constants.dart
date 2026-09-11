@@ -79,7 +79,7 @@ List<Color> chartPieColors = [
   Color.fromRGBO(225, 123, 66, 1),
 ];
 
-String format(double number) =>
+String format(num number) =>
     NumberFormat("#,###,###,###,###,###.##", "en_US").format(number);
 
 IconData iconData(CategoryItem item) => IconData(item.iconCodePoint,
@@ -163,12 +163,12 @@ final List<String> timeline = [
   'All'
 ];
 
-InputModel inputModel(data) => InputModel(
+InputModel inputModel(InputModel data) => InputModel(
     id: data.id,
     type: data.type,
-    amount: data.amount!,
-    category: data.category!,
-    description: data.description!,
+    amount: data.amount ?? 0,
+    category: data.category ?? '',
+    description: data.description ?? '',
     date: data.date,
     time: data.time);
 

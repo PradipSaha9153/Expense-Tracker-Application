@@ -58,19 +58,19 @@ Future<void> androidDialog(BuildContext context, String content, String action,
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(getTranslated(context, 'Please Confirm')!),
+            title: Text(getTranslated(context, 'Please Confirm') ?? 'Please Confirm'),
             content: Text(
                 getTranslated(context, content) ?? content),
             actions: [
               TextButton(
                   onPressed: () {
-                    onAction();
                     Navigator.pop(context);
                   },
                   child: Text(getTranslated(context, 'Cancel') ?? 'Cancel')),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    onAction();
                   },
                   child: Text(getTranslated(context, action) ?? action))
             ],

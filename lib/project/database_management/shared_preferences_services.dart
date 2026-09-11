@@ -11,9 +11,9 @@ import 'package:money_assistant_2608/project/localization/methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sharedPrefs = SharedPrefs();
+String get currency => sharedPrefs.currencySymbol;
 // constants/strings.dart
 // const String appCurrency = 'app_currency';
-late String currency;
 var incomeItems = sharedPrefs.getItems('income items');
 
 class SharedPrefs {
@@ -36,6 +36,17 @@ class SharedPrefs {
 
   set appCurrency(String appCurrency) =>
       _sharedPrefs!.setString('appCurrency', appCurrency);
+
+  String get currencySymbol {
+    try {
+      var format = NumberFormat.simpleCurrency(locale: appCurrency);
+      return format.currencySymbol;
+    } catch (_) {
+      return '₹';
+    }
+  }
+
+  String get currency => currencySymbol;
 
   String get dateFormat =>
       _sharedPrefs!.getString('dateFormat') ?? 'dd/MM/yyyy';
@@ -73,13 +84,7 @@ class SharedPrefs {
   }
 
   void getCurrency() {
-    if (_sharedPrefs!.containsKey('appCurrency')) {
-      var format = NumberFormat.simpleCurrency(locale: sharedPrefs.appCurrency);
-      currency = format.currencySymbol;
-    } else {
-      var format = NumberFormat.simpleCurrency(locale: Platform.localeName);
-      currency = format.currencySymbol;
-    }
+    // currency is dynamically retrieved via the currency getter
   }
 
   //jsonEncode turns a Map<String, dynamic> into a json string,

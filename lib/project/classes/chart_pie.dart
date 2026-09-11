@@ -1,86 +1,165 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:money_assistant_2608/project/classes/constants.dart';
+import 'package:money_assistant_2608/project/database_management/shared_preferences_services.dart';
 import 'package:money_assistant_2608/project/localization/methods.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'input_model.dart';
 
 class ChartPie extends StatelessWidget {
-  const ChartPie(this.transactionsSorted);
   final List<InputModel> transactionsSorted;
+  final double totalAmount;
+  final String type;
+  final bool showPercentage;
+
+  const ChartPie(
+    this.transactionsSorted, {
+    this.totalAmount = 0,
+    this.type = 'Expense',
+    this.showPercentage = false,
+  });
+
   @override
   Widget build(BuildContext context) {
-    bool haveRecords;
-    String width;
-    String height;
-    double animationDuration;
-
-    if (this.transactionsSorted[0].category == '') {
-      haveRecords = false;
-      width = '67%';
-      height = '67%';
-      animationDuration = 0;
-    } else {
-      haveRecords = true;
-      width = '67%';
-      height = '67%';
-      animationDuration = 270;
-    }
+    bool haveRecords = transactionsSorted.isNotEmpty && transactionsSorted[0].category != '';
+    double animationDuration = haveRecords ? 300 : 0;
 
     return SfCircularChart(
       tooltipBehavior: TooltipBehavior(enable: haveRecords),
       annotations: <CircularChartAnnotation>[
         CircularChartAnnotation(
-            width: width, height: height, widget: Annotations(haveRecords))
+          width: '55%',
+          height: '55%',
+          widget: ChartCenterAnnotation(
+            haveRecords: haveRecords,
+            totalAmount: totalAmount,
+            type: type,
+          ),
+        ),
       ],
       series: <CircularSeries<InputModel, String>>[
         DoughnutSeries<InputModel, String>(
-            startAngle: 90,
-            endAngle: 90,
-            animationDuration: animationDuration,
-            // enableSmartLabels: haveRecords,
-            sortingOrder: SortingOrder.descending,
-            sortFieldValueMapper: (InputModel data, _) => data.category,
-            enableTooltip: haveRecords,
-            dataSource: this.transactionsSorted,
-            pointColorMapper: (InputModel data, _) => data.color,
-            xValueMapper: (InputModel data, _) => getTranslated(context, data.category!) ?? data.category,
-            yValueMapper: (InputModel data, _) => data.amount,
-            dataLabelSettings: DataLabelSettings(
-              showZeroValue: true,
-              useSeriesColor: true,
-              labelPosition: ChartDataLabelPosition.outside,
-              isVisible: haveRecords,
+          startAngle: 90,
+          endAngle: 90,
+          animationDuration: animationDuration,
+          sortingOrder: SortingOrder.descending,
+          sortFieldValueMapper: (InputModel data, _) => data.category,
+          enableTooltip: haveRecords,
+          dataSource: transactionsSorted,
+          pointColorMapper: (InputModel data, _) => data.color,
+          xValueMapper: (InputModel data, _) =>
+              getTranslated(context, data.category!) ?? data.category,
+          yValueMapper: (InputModel data, _) => data.amount ?? 0,
+          dataLabelMapper: (InputModel data, _) {
+            if (!haveRecords) return '';
+            double amt = data.amount ?? 0;
+            if (showPercentage && totalAmount > 0) {
+              double pct = (amt / totalAmount) * 100;
+              return '${pct.toStringAsFixed(1)}%';
+            } else {
+              return '${format(amt)} $currency';
+            }
+          },
+          dataLabelSettings: DataLabelSettings(
+            showZeroValue: false,
+            useSeriesColor: true,
+            labelPosition: ChartDataLabelPosition.outside,
+            connectorLineSettings: ConnectorLineSettings(
+              type: ConnectorType.curve,
+              length: '15%',
             ),
-            innerRadius: '50%',
-            radius: '67%'),
+            isVisible: haveRecords,
+            textStyle: GoogleFonts.poppins(
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          innerRadius: '60%',
+          radius: '75%',
+        ),
       ],
     );
   }
 }
 
-class Annotations extends StatelessWidget {
+class ChartCenterAnnotation extends StatelessWidget {
   final bool haveRecords;
-  const Annotations(this.haveRecords);
+  final double totalAmount;
+  final String type;
+
+  const ChartCenterAnnotation({
+    required this.haveRecords,
+    required this.totalAmount,
+    required this.type,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return PhysicalModel(
-        child: Container(
-          child: haveRecords == false
-              ? Center(
-                  child: Text(getTranslated(context, 'There is no data')!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                          fontSize: 23.5.sp,
-                          fontStyle: FontStyle.italic)),
-                )
-              : null,
+    if (!haveRecords) {
+      return Center(
+        child: Text(
+          getTranslated(context, 'There is no data') ?? 'There is no data',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            color: Colors.grey[500],
+            fontSize: 13.sp,
+            fontStyle: FontStyle.italic,
+          ),
         ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
         shape: BoxShape.circle,
-        elevation: 10,
-        shadowColor: Colors.black,
-        color: const Color.fromRGBO(230, 230, 230, 1));
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Total',
+            style: GoogleFonts.poppins(
+              color: Colors.grey[600],
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Text(
+                '${format(totalAmount)} $currency',
+                style: GoogleFonts.poppins(
+                  color: Colors.black87,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            type == 'Income' ? 'Income' : 'Expenses',
+            style: GoogleFonts.poppins(
+              color: Colors.grey[600],
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,17 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:money_assistant_2608/project/classes/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:money_assistant_2608/project/database_management/sqflite_services.dart';
 import 'package:rate_my_app/rate_my_app.dart';
-import 'dart:io' show Platform;
 import 'app_pages/analysis.dart';
-import 'app_pages/input.dart';
-import 'localization/methods.dart';
 import 'app_pages/calendar.dart';
+import 'app_pages/input.dart';
 import 'app_pages/others.dart';
+import 'localization/methods.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -26,17 +23,6 @@ class _HomeState extends State<Home> {
     Calendar(),
     Other(),
   ];
-  BottomNavigationBarItem bottomNavigationBarItem(
-          IconData iconData, String label) =>
-      BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.only(bottom: 0.h),
-          child: Icon(
-            iconData,
-          ),
-        ),
-        label: getTranslated(context, label),
-      );
 
   @override
   void initState() {
@@ -44,7 +30,6 @@ class _HomeState extends State<Home> {
     DB.init();
     var rateMyApp = RateMyApp(
       minDays: 0,
-      // Will pop up the first time users launch the app
       minLaunches: 1,
       remindDays: 4,
       remindLaunches: 15,
@@ -53,84 +38,89 @@ class _HomeState extends State<Home> {
     );
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
-
       await rateMyApp.init();
-      rateMyApp.conditions.forEach((condition) {
-        if (condition is DebuggableCondition) {
-          print(condition);
-          // condition.reset();
-        }
-      });
       if (mounted && rateMyApp.shouldOpenDialog) {
         rateMyApp.showRateDialog(
           context,
-          // title: 'Rate this app', // The dialog title.
-          // message:
-          //     'If you like this app, please take a little bit of your time to review it!\nYour support means the world to us ^^', // The dialog message.
-          // rateButton: 'RATE', // The dialog "rate" button text.
-          // noButton: 'NO THANKS', // The dialog "no" button text.
-          // laterButton: 'MAYBE LATER', // The dialog "later" button text.
-          // listener: (button) {
-          //   // The button click listener (useful if you want to cancel the click event).
-          //   switch (button) {
-          //     case RateMyAppDialogButton.rate:
-          //       print('Clicked on "Rate".');
-          //       break;
-          //     case RateMyAppDialogButton.later:
-          //       print('Clicked on "Later".');
-          //       break;
-          //     case RateMyAppDialogButton.no:
-          //       print('Clicked on "No".');
-          //       break;
-          //   }
-          //   return true; // Return false if you want to cancel the click event.
-          // },
-          ignoreNativeDialog: Platform
-              .isAndroid, // Set to false if you want to show the Apple's native app rating dialog on iOS or Google's native app rating dialog (depends on the current Platform).
-          onDismissed: () => rateMyApp.callEvent(RateMyAppEventType
-              .laterButtonPressed), // Called when the user dismissed the dialog (either by taping outside or by pressing the "back" button).
-          // contentBuilder: (context, defaultContent) => Text('ok'), // This one allows you to change the default dialog content.
-          // actionsBuilder: (context) => [], // This one allows you to use your own buttons.
+          ignoreNativeDialog: Platform.isAndroid,
+          onDismissed: () => rateMyApp.callEvent(RateMyAppEventType.laterButtonPressed),
         );
       }
     });
   }
 
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 24.sp,
+              color: isSelected ? Color(0xFF00695C) : Colors.grey[500],
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              getTranslated(context, label) ?? label,
+              style: GoogleFonts.poppins(
+                fontSize: 12.sp,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Color(0xFF00695C) : Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: 4.h),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              height: 3.h,
+              width: isSelected ? 24.w : 0,
+              decoration: BoxDecoration(
+                color: Color(0xFF00695C),
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<BottomNavigationBarItem> bottomItems = <BottomNavigationBarItem>[
-      bottomNavigationBarItem(Icons.add, 'Input'),
-      bottomNavigationBarItem(Icons.analytics_outlined, 'Analysis'),
-      bottomNavigationBarItem(Icons.calendar_today, 'Calendar'),
-      bottomNavigationBarItem(Icons.account_circle, 'Other'),
-    ];
-
     return Scaffold(
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: grey,
-              ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            iconSize: 27.sp,
-            selectedFontSize: 16.sp,
-            unselectedFontSize: 14.sp,
-            backgroundColor: white,
-            selectedItemColor: Colors.amber[800],
-            unselectedItemColor: Colors.black87,
-            type: BottomNavigationBarType.fixed,
-            items: bottomItems,
-            currentIndex: _selectedIndex,
-            onTap: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
+      extendBody: true,
+      body: myBody[_selectedIndex],
+      bottomNavigationBar: Container(
+        margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 16.h),
+        height: 68.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 15,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
-        body: myBody[_selectedIndex]);
+        child: Row(
+          children: [
+            _buildNavItem(0, Icons.add_circle_outline_rounded, 'Add'),
+            _buildNavItem(1, Icons.bar_chart_rounded, 'Analysis'),
+            _buildNavItem(2, Icons.calendar_today_rounded, 'Calendar'),
+            _buildNavItem(3, Icons.person_outline_rounded, 'Other'),
+          ],
+        ),
+      ),
+    );
   }
 }
