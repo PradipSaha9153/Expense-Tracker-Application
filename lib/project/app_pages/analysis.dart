@@ -882,7 +882,7 @@ class CategoryWiseCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: type == 'Income' ? Color(0xFF4CAF50) : Color(0xFFFF5252),
                   ),
                 ),
                 SizedBox(width: 10.w),
