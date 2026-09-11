@@ -757,44 +757,16 @@ class ShowDashboardDetails extends StatelessWidget {
   }
 
   Widget _buildCategoryHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Category Wise',
-          style: GoogleFonts.poppins(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        'Category Wise',
+        style: GoogleFonts.poppins(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
         ),
-        TextButton(
-          onPressed: () {},
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: Row(
-            children: [
-              Text(
-                'See All',
-                style: GoogleFonts.poppins(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF00695C),
-                ),
-              ),
-              SizedBox(width: 2.w),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 18.sp,
-                color: Color(0xFF00695C),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
