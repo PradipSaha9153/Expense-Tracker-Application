@@ -171,7 +171,7 @@ class _AddInputState extends State<AddInput> {
                                       ),
                                       child: Icon(
                                         Icons.south_west_rounded,
-                                        color: Color(0xFF00695C),
+                                        color: Color(0xFFFF5252),
                                         size: 18.sp,
                                       ),
                                     ),
@@ -239,7 +239,7 @@ class _AddInputState extends State<AddInput> {
                                       ),
                                       child: Icon(
                                         Icons.north_east_rounded,
-                                        color: Color(0xFF00695C),
+                                        color: Color(0xFF4CAF50),
                                         size: 18.sp,
                                       ),
                                     ),

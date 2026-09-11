@@ -113,7 +113,7 @@ class _AnalysisState extends State<Analysis> {
                                         ),
                                         child: Icon(
                                           Icons.south_west_rounded,
-                                          color: Color(0xFF00695C),
+                                          color: Color(0xFFFF5252),
                                           size: 16.sp,
                                         ),
                                       ),
@@ -181,7 +181,7 @@ class _AnalysisState extends State<Analysis> {
                                         ),
                                         child: Icon(
                                           Icons.north_east_rounded,
-                                          color: Color(0xFF00695C),
+                                          color: Color(0xFF4CAF50),
                                           size: 16.sp,
                                         ),
                                       ),
