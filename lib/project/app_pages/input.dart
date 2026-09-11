@@ -60,7 +60,7 @@ class _AddInputState extends State<AddInput> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('images/login_bg.png'),
+                image: AssetImage('images/analysis_bg.png'),
                 fit: BoxFit.cover,
               ),
             ),
