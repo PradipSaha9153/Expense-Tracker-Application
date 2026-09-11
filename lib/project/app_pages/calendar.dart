@@ -916,7 +916,7 @@ class DailySummaryCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Balance', style: GoogleFonts.poppins(fontSize: 11.sp, color: Colors.grey[600])),
+                          Text('Remaining', style: GoogleFonts.poppins(fontSize: 11.sp, color: Colors.grey[600])),
                           FittedBox(
                             child: Text(
                               '${format(balance)} $currency',
