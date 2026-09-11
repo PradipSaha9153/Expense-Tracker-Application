@@ -81,7 +81,7 @@ class _AddInputState extends State<AddInput> {
                               Text(
                                 getTranslated(context, 'Add Transaction') ?? 'Add Transaction',
                                 style: GoogleFonts.poppins(
-                                  color: Colors.white,
+                                  color: Color(0xFF00574A),
                                   fontSize: 22.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -91,7 +91,7 @@ class _AddInputState extends State<AddInput> {
                               Text(
                                 'Track today • Balance tomorrow',
                                 style: GoogleFonts.poppins(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Color(0xFF00574A).withOpacity(0.85),
                                   fontSize: 12.sp,
                                 ),
                                 overflow: TextOverflow.ellipsis,
