@@ -1,308 +1,435 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
+import 'package:money_assistant_2608/project/app_pages/currency.dart';
 import 'package:money_assistant_2608/project/app_pages/select_date_format.dart';
 import 'package:money_assistant_2608/project/app_pages/select_language.dart';
 import 'package:money_assistant_2608/project/auth_pages/user_account.dart';
 import 'package:money_assistant_2608/project/classes/alert_dialog.dart';
-import 'package:money_assistant_2608/project/classes/constants.dart';
 import 'package:money_assistant_2608/project/classes/custom_toast.dart';
 import 'package:money_assistant_2608/project/database_management/shared_preferences_services.dart';
 import 'package:money_assistant_2608/project/database_management/sqflite_services.dart';
 import 'package:money_assistant_2608/project/localization/methods.dart';
-import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:io' show Platform;
-import '../provider.dart';
-import 'currency.dart';
 
 class Other extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return SettingsPage();
+  }
+}
+
+class SettingsPage extends StatefulWidget {
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    String todayFormatted = DateFormat(sharedPrefs.dateFormat).format(DateTime.now());
+
     return Scaffold(
-        primary: true,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(
-            150.h,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/analysis_bg.png'),
+            fit: BoxFit.cover,
           ),
-          child: Container(
-            color: blue3,
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
-            height: 200.h,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Top Header Banner
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                child: Row(
+                  children: [
+                    // Profile Avatar with Yellow Ring
+                    Container(
+                      padding: EdgeInsets.all(3.r),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFB300),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Container(
+                        width: 52.r,
+                        height: 52.r,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.sentiment_satisfied_alt_rounded,
+                            color: Colors.black87,
+                            size: 38.r,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 14.w),
+
+                    // Greeting Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            getTranslated(context, 'Hi you') != null
+                                ? '${getTranslated(context, 'Hi you')}!'
+                                : 'Hi you!',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            'Manage your app, your way 🌱',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Edit Button
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => UserAccount()),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.4),
+                            width: 1.w,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.edit_rounded,
+                              color: Colors.white,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Edit',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Settings List Cards
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
+                  children: [
+                    // My Account
+                    SettingsCard(
+                      icon: Icons.person_rounded,
+                      iconColor: Color(0xFF2196F3),
+                      bgColor: Color(0xFFE3F2FD),
+                      title: 'My Account',
+                      subtitle: 'View and edit your profile',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => UserAccount()),
+                        );
+                      },
+                    ),
+
+                    // Language
+                    SettingsCard(
+                      icon: Icons.language_rounded,
+                      iconColor: Color(0xFF9C27B0),
+                      bgColor: Color(0xFFF3E5F5),
+                      title: 'Language',
+                      subtitle: 'Choose your preferred language',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SelectLanguage()),
+                        );
+                      },
+                    ),
+
+                    // Currency
+                    SettingsCard(
+                      icon: Icons.currency_rupee_rounded,
+                      iconColor: Color(0xFF009688),
+                      bgColor: Color(0xFFE0F2F1),
+                      title: 'Currency',
+                      subtitle: 'Select your currency',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Currency()),
+                        );
+                      },
+                    ),
+
+                    // Date Format
+                    SettingsCard(
+                      icon: Icons.calendar_month_rounded,
+                      iconColor: Color(0xFFFF5722),
+                      bgColor: Color(0xFFFFF3E0),
+                      title: 'Date Format',
+                      subtitle: 'Set date format ($todayFormatted)',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FormatDate()),
+                        ).then((_) => setState(() {}));
+                      },
+                    ),
+
+                    // Reset All Categories
+                    SettingsCard(
+                      icon: Icons.refresh_rounded,
+                      iconColor: Color(0xFFE91E63),
+                      bgColor: Color(0xFFFFEBEE),
+                      title: 'Reset All Categories',
+                      subtitle: 'Remove and restore default categories',
+                      onTap: () async {
+                        void onReset() {
+                          sharedPrefs.setItems(setCategoriesToDefault: true);
+                          customToast(context, 'Categories have been reset');
+                        }
+
+                        if (Platform.isIOS) {
+                          await iosDialog(
+                            context,
+                            'This action cannot be undone. Are you sure you want to reset all categories?',
+                            'Reset',
+                            onReset,
+                          );
+                        } else {
+                          await androidDialog(
+                            context,
+                            'This action cannot be undone. Are you sure you want to reset all categories?',
+                            'Reset',
+                            onReset,
+                          );
+                        }
+                      },
+                    ),
+
+                    // Delete All Data
+                    SettingsCard(
+                      icon: Icons.delete_outline_rounded,
+                      iconColor: Color(0xFFF44336),
+                      bgColor: Color(0xFFFFEBEE),
+                      title: 'Delete All Data',
+                      subtitle: 'Permanently delete your data',
+                      onTap: () async {
+                        Future onDeletion() async {
+                          await DB.deleteAll();
+                          customToast(context, 'All data has been deleted');
+                        }
+
+                        if (Platform.isIOS) {
+                          await iosDialog(
+                            context,
+                            'Deleted data can not be recovered. Are you sure you want to delete all data?',
+                            'Delete',
+                            onDeletion,
+                          );
+                        } else {
+                          await androidDialog(
+                            context,
+                            'Deleted data can not be recovered. Are you sure you want to delete all data?',
+                            'Delete',
+                            onDeletion,
+                          );
+                        }
+                      },
+                    ),
+
+                    // Share with Friends
+                    SettingsCard(
+                      icon: Icons.share_rounded,
+                      iconColor: Color(0xFF03A9F4),
+                      bgColor: Color(0xFFE3F2FD),
+                      title: 'Share with Friends',
+                      subtitle: 'Tell your friends about this app',
+                      onTap: () {
+                        Share.share(
+                            'https://apps.apple.com/us/app/mmas-money-tracker-bookkeeper/id1582638369');
+                      },
+                    ),
+
+                    // Rate App
+                    SettingsCard(
+                      icon: Icons.star_rounded,
+                      iconColor: Color(0xFFFFB300),
+                      bgColor: Color(0xFFFFFDE7),
+                      title: 'Rate App',
+                      subtitle: 'If you like the app, please rate us',
+                      onTap: () async {
+                        final InAppReview inAppReview = InAppReview.instance;
+                        await inAppReview.openStoreListing(
+                          appStoreId: Platform.isIOS
+                              ? '1582638369'
+                              : 'com.mmas.money_assistant_2608',
+                        );
+                      },
+                    ),
+
+                    // About
+                    SettingsCard(
+                      icon: Icons.info_outline_rounded,
+                      iconColor: Color(0xFF673AB7),
+                      bgColor: Color(0xFFF3E5F5),
+                      title: 'About',
+                      subtitle: 'App version, privacy policy, more',
+                      onTap: () {
+                        showAboutDialog(
+                          context: context,
+                          applicationName: 'Spendrym',
+                          applicationVersion: '1.0.8',
+                          applicationIcon: Image.asset('images/app_icon.png', width: 48, height: 48),
+                          children: [
+                            Text('Spendrym is your personal daily expense tracker and finance assistant.'),
+                          ],
+                        );
+                      },
+                    ),
+                    SizedBox(height: 30.h),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color bgColor;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const SettingsCard({
+    required this.icon,
+    required this.iconColor,
+    required this.bgColor,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18.r),
+            onTap: onTap,
             child: Padding(
-              padding: EdgeInsets.only(top: 30.w),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    child: CircleAvatar(
-                        child: Icon(
-                          Icons.sentiment_very_satisfied,
-                          color: Colors.black,
-                          size: 71.sp,
+                  // Icon Badge
+                  Container(
+                    width: 44.r,
+                    height: 44.r,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        color: iconColor,
+                        size: 22.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 14.w),
+
+                  // Title & Subtitle
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          getTranslated(context, title) ?? title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                         ),
-                        radius: 35.r,
-                        backgroundColor: blue1),
-                    radius: 40.r,
-                    backgroundColor: Colors.orangeAccent,
+                        SizedBox(height: 2.h),
+                        Text(
+                          getTranslated(context, subtitle) ?? subtitle,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12.sp,
+                            color: Colors.grey[500],
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(
-                    width: 20.w,
+
+                  // Chevron Right
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: 22.sp,
+                    color: Colors.grey[400],
                   ),
-                  Text(
-                    '${getTranslated(context, 'Hi you')!}!',
-                    style: TextStyle(fontSize: 30.sp),
-                  ),
-                  // Spacer(),
-                  // Icon(
-                  //   Icons.notifications_rounded,
-                  //   size: 25.sp,
-                  // )
                 ],
               ),
             ),
           ),
         ),
-        body: ChangeNotifierProvider<OnSwitch>(
-            create: (context) => OnSwitch(),
-            builder: (context, widget) => Settings(providerContext: context)));
+      ),
+    );
   }
 }
-
-class Settings extends StatefulWidget {
-  final BuildContext providerContext;
-  const Settings({required this.providerContext});
-
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> pageRoute = [
-      UserAccount(),
-      SelectLanguage(),
-      Currency(),
-    ];
-    List<Widget> settingsIcons = [
-      Icon(
-        Icons.account_circle,
-        size: 35,
-        color: Colors.lightBlue,
-      ),
-      // Icon(
-      //   Icons.settings,
-      //   size: 32,
-      //   color: Colors.blueGrey[800],
-      // ),
-      // Icon(
-      //   Icons.feedback,
-      //   size: 35.sp,
-      //   color: Colors.black54,
-      // ),
-      Icon(
-        Icons.language,
-        size: 32.sp,
-        color: Colors.lightBlue,
-      ),
-      Icon(
-        Icons.monetization_on,
-        size: 32.sp,
-        color: Colors.orangeAccent,
-      ),
-      Icon(Icons.format_align_center, size: 32.sp, color: Colors.lightBlue),
-      Icon(Icons.refresh, size: 32.sp, color: Colors.lightBlue),
-      Icon(Icons.delete_forever, size: 32.sp, color: red),
-      // Icon(Icons.lock, size: 32.sp, color: Colors.blueGrey),
-      Icon(
-        Icons.share,
-        size: 28.sp,
-        color: Colors.lightBlue,
-      ),
-      Icon(
-        Icons.star,
-        size: 32.sp,
-        color: Colors.amber,
-      ),
-    ];
-    List<String> settingsList = [
-      getTranslated(context, 'My Account')!,
-      // getTranslated(context, 'General Settings')!,
-      // getTranslated(context, 'Feedback')!,
-      getTranslated(context, 'Language') ?? 'Language',
-      getTranslated(context, 'Currency') ?? 'Currency',
-      (getTranslated(context, 'Date format') ??
-          'Date format') +
-              ' (${DateFormat(sharedPrefs.dateFormat).format(now)})',
-      getTranslated(context, 'Reset All Categories') ?? 'Reset All Categories',
-      getTranslated(context, 'Delete All Data') ?? 'Delete All Data',
-      // getTranslated(context, 'Enable Passcode') ?? 'Enable Passcode',
-      getTranslated(context, 'Share Friends') ?? 'Share Friends',
-      getTranslated(context, 'Rate App') ?? 'Rate App',
-    ];
-
-    return ListView.builder(
-        itemCount: settingsList.length,
-        itemBuilder: (context, int) {
-          // void onPasscodeSwitched() {
-          //   context.read<OnSwitch>().onSwitch();
-          //   if (context.read<OnSwitch>().isPasscodeOn) {
-          //     showDialog<void>(
-          //         context: context,
-          //         builder: (providerContext) =>
-          //             OtherLockScreen(providerContext: this.providerContext));
-          //   } else {
-          //    customToast(context, 'Passcode has been disabled');
-          //   }
-          // }
-
-          return GestureDetector(
-            onTap: () async {
-              if ((int == 0) || (int == 1) || (int == 2)) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => pageRoute[int]));
-              } else if (int == 3) {
-                Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => FormatDate()))
-                    .then((value) => setState(() {}));
-              } else if (int == 4) {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => EditIncomeCategory(null)));
-                void onReset() {
-                  sharedPrefs.setItems(setCategoriesToDefault: true);
-                  customToast(context, 'Categories have been reset');
-                }
-
-                Platform.isIOS
-                    ? await iosDialog(
-                        context,
-                        'This action cannot be undone. Are you sure you want to reset all categories?',
-                        'Reset',
-                        onReset)
-                    : await androidDialog(
-                        context,
-                        'This action cannot be undone. Are you sure you want to reset all categories?',
-                        'reset',
-                        onReset);
-              } else if (int == 5) {
-                Future onDeletion() async {
-                  await DB.deleteAll();
-                  customToast(context, 'All data has been deleted');
-                }
-
-                Platform.isIOS
-                    ? await iosDialog(
-                        context,
-                        'Deleted data can not be recovered. Are you sure you want to delete all data?',
-                        'Delete',
-                        onDeletion)
-                    : await androidDialog(
-                        context,
-                        'Deleted data can not be recovered. Are you sure you want to delete all data?',
-                        'Delete',
-                        onDeletion);
-              }
-              // else if (int == 4) {
-              //   onPasscodeSwitched();
-              // }
-              else if (int == 6) {
-                Share.share(
-                    'https://apps.apple.com/us/app/mmas-money-tracker-bookkeeper/id1582638369');
-              } else {
-                final InAppReview inAppReview = InAppReview.instance;
-                await inAppReview.openStoreListing(
-                  appStoreId: Platform.isIOS
-                      ? '1582638369'
-                      : 'com.mmas.money_assistant_2608',
-                );
-              }
-            },
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 7.h),
-                  child: SizedBox(
-                    child: Center(
-                        child: ListTile(
-                      title: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: Text(
-                          '${settingsList[int]}',
-                          style: TextStyle(fontSize: 18.5.sp),
-                        ),
-                      ),
-                      leading: CircleAvatar(
-                          radius: 24.r,
-                          backgroundColor: Color.fromRGBO(229, 231, 234, 1),
-                          child: settingsIcons[int]),
-                      trailing:
-                          // int == 4
-                          // ? Switch(
-                          //     value: context.watch<OnSwitch>().isPasscodeOn,
-                          //     onChanged: (value) {
-                          //       onPasscodeSwitched();
-                          //     },
-                          //     activeTrackColor: blue1,
-                          //     activeColor: Color.fromRGBO(71, 131, 192, 1),
-                          //   ) :
-                          Icon(
-                        Icons.arrow_forward_ios,
-                        size: 20.sp,
-                        color: Colors.blueGrey,
-                      ),
-                    )),
-                  ),
-                ),
-                Divider(
-                  indent: 78.w,
-                  height: 0.1.h,
-                  thickness: 0.4.h,
-                  color: grey,
-                ),
-              ],
-            ),
-          );
-        });
-  }
-}
-
-// class Upgrade extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       alignment: Alignment.center,
-//       children: [
-//         Container(
-//           height: 165.h,
-//           color: Color.fromRGBO(234, 234, 234, 1),
-//         ),
-//         Container(
-//           alignment: Alignment.center,
-//           height: 115.h,
-//           decoration: BoxDecoration(
-//               image: DecorationImage(
-//                   fit: BoxFit.fill, image: AssetImage('images/image13.jpg'))),
-//         ),
-//         Container(
-//           alignment: Alignment.center,
-//           decoration: BoxDecoration(
-//               color: Color.fromRGBO(255, 255, 255, 1),
-//               borderRadius: BorderRadius.circular(40),
-//               border: Border.all(
-//                 color: Colors.grey,
-//                 width: 0.5.w,
-//               )),
-//           height: 55.h,
-//           width: 260.w,
-//           child: Text(
-//             getTranslated(context, 'VIEW UPGRADE OPTIONS')!,
-//             style: TextStyle(fontSize: 4.206, fontWeight: FontWeight.bold),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }

@@ -117,7 +117,7 @@ class _HomeState extends State<Home> {
             _buildNavItem(0, Icons.add_circle_outline_rounded, 'Add'),
             _buildNavItem(1, Icons.bar_chart_rounded, 'Analysis'),
             _buildNavItem(2, Icons.calendar_today_rounded, 'Calendar'),
-            _buildNavItem(3, Icons.person_outline_rounded, 'Other'),
+            _buildNavItem(3, Icons.settings_outlined, 'Settings'),
           ],
         ),
       ),
